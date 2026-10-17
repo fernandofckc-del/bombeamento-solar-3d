@@ -165,12 +165,9 @@ td{font-family:var(--f-data);font-variant-numeric:tabular-nums}
 
 /* entradas */
 .blk{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
-.blk>summary{list-style:none;cursor:pointer;padding:12px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:10px;row-gap:1px;align-items:center}
-.blk>summary::-webkit-details-marker{display:none}
-.blk>summary h2{font-size:1.15rem;text-transform:uppercase;letter-spacing:.04em}
-.blk>summary .sum{grid-column:1;grid-row:2;font-size:.8rem;color:var(--muted)}
-.blk>summary::after{grid-column:2;grid-row:1/3;content:"";width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin:-4px 2px 0 4px;transition:transform .2s;flex:none}
-.blk[open]>summary::after{transform:rotate(225deg);margin-top:4px}
+.blk>.hd{padding:12px 14px;display:flex;align-items:baseline;justify-content:space-between;gap:4px 10px;flex-wrap:wrap}
+.blk>.hd h2{font-size:1.15rem;text-transform:uppercase;letter-spacing:.04em}
+.blk>.hd .sum{font-size:.8rem;color:var(--muted)}
 .blk .in{padding:2px 14px 16px;display:grid;gap:14px;border-top:1px solid var(--line-2)}
 .fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px}
 .fields.three{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -206,8 +203,40 @@ td{font-family:var(--f-data);font-variant-numeric:tabular-nums}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:600}
 .adv>summary{cursor:pointer;font-size:.85rem;color:var(--series-1);font-weight:500;padding:2px 0}
 .adv[open]>summary{margin-bottom:10px}
-.notes{font-size:.84rem;color:var(--ink-2);display:grid;gap:6px}
-.notes ul{margin:0;padding-left:18px;display:grid;gap:4px}
+.notes{font-size:.84rem;color:var(--ink-2);background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 14px}
+.notes>summary{cursor:pointer;font:600 1rem/1.3 var(--f-display);text-transform:uppercase;letter-spacing:.04em;color:var(--ink)}
+.notes ul{margin:10px 0 2px;padding-left:18px;display:grid;gap:4px}
+
+/* abas com ícones */
+.tabs{position:sticky;top:0;z-index:15;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;background:var(--bg);
+  margin:0 -4px;padding:6px 4px 0;border-bottom:1px solid var(--line)}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1 1 0;min-width:46px;display:grid;justify-items:center;gap:3px;position:relative;border:0;background:none;cursor:pointer;
+  padding:7px 2px 8px;color:var(--muted);font-size:.68rem;white-space:nowrap;font-weight:500;letter-spacing:.02em;border-radius:8px 8px 0 0}
+.tab svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tab:hover{color:var(--ink-2);background:var(--surface-2)}
+.tab[aria-selected="true"]{color:var(--accent);font-weight:600}
+.tab[aria-selected="true"]::after{content:"";position:absolute;left:8px;right:8px;bottom:-1px;height:3px;border-radius:3px 3px 0 0;background:var(--accent)}
+.tab .badge{position:absolute;top:3px;left:calc(50% + 7px);min-width:17px;height:17px;padding:0 4px;border-radius:999px;font:700 .64rem/17px var(--f-body);
+  background:var(--warn);color:#3a2600;text-align:center}
+.tab .badge[data-l="bad"]{background:var(--bad);color:#fff}
+.panel{display:grid;gap:18px;min-width:0}
+.panel[hidden]{display:none!important}
+@media (min-width:1000px){.tabs{top:12px;border-radius:var(--r) var(--r) 0 0}}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface)}
+.opt.rec{background:color-mix(in srgb,var(--good) 8%,var(--surface));border-color:color-mix(in srgb,var(--good) 45%,var(--line))}
+.opt.cur{box-shadow:inset 3px 0 0 var(--accent)}
+.opt .nm{font-weight:600;font-size:.95rem}
+.opt .nm small{font-weight:400;color:var(--muted);font-size:.78rem;margin-left:6px}
+.opt .nums{grid-column:1/-1;font:500 .82rem/1.35 var(--f-data);color:var(--ink-2);display:flex;gap:4px 14px;flex-wrap:wrap}
+.opt .nums b{font-weight:600;color:var(--ink)}
+.opt .st{grid-column:1/-1;font-size:.8rem;color:var(--ink-2);line-height:1.35}
+.opt .st i{font-style:normal;font-weight:700;margin-right:5px}
+.opt .st[data-l="ok"] i{color:var(--good)} .opt .st[data-l="warn"] i{color:#9a6400} .opt .st[data-l="bad"] i{color:var(--bad)}
+.opt .use{border:1px solid var(--line);background:var(--surface-2);border-radius:7px;padding:6px 12px;font-size:.8rem;font-weight:600;cursor:pointer;min-height:34px}
+.opt .use[disabled]{opacity:.55;cursor:default}
+.pill{display:inline-block;font:700 .6rem/1 var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--good);border-radius:999px;padding:3px 6px;margin-left:6px;vertical-align:2px}
 .toast{font-size:.84rem;color:var(--good);font-weight:500}
 
 /* barra fixa (celular) */
@@ -273,45 +302,113 @@ td{font-family:var(--f-data);font-variant-numeric:tabular-nums}
   </div>
 
   <div class="col-info">
-    <section class="sec" id="sec-result" aria-labelledby="h-result">
-      <div class="sec-h"><h2 id="h-result">Resultado do dia</h2><span class="aside" id="sky-aside">céu limpo</span></div>
-      <div class="tiles">
-        <div class="tile"><span class="k">Água no dia</span><span class="val" id="t-vol">–</span><span class="s" id="t-vol-s"></span></div>
-        <div class="tile"><span class="k">Bombeando</span><span class="val" id="t-hrs">–</span><span class="s" id="t-hrs-s"></span></div>
-        <div class="tile"><span class="k">Vazão máxima</span><span class="val" id="t-qmax">–</span><span class="s" id="t-qmax-s"></span></div>
-        <div class="tile"><span class="k">Corrente máxima</span><span class="val" id="t-imax">–</span><span class="s" id="t-imax-s"></span></div>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Seções">
+      <button class="tab" role="tab" id="tab-res" data-tab="res" aria-controls="p-res" aria-selected="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5c3.2 4 5.5 7.2 5.5 10.2a5.5 5.5 0 0 1-11 0C6.5 10.7 8.8 7.5 12 3.5z"/></svg>
+        <span>Resumo</span><b class="badge" id="tab-badge" hidden></b>
+      </button>
+      <button class="tab" role="tab" id="tab-graf" data-tab="graf" aria-controls="p-graf" aria-selected="false" tabindex="-1">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5h16M5 15l4-5 4 3 6-7"/></svg>
+        <span>Gráficos</span>
+      </button>
+      <button class="tab" role="tab" id="tab-placas" data-tab="placas" aria-controls="p-placas" aria-selected="false" tabindex="-1">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 4h13l2 10.5h-17zM4.4 9.2h15.2M10 4l-.8 10.5M14 4l.8 10.5M12 14.5V19M8 19.5h8"/></svg>
+        <span>Placas</span>
+      </button>
+      <button class="tab" role="tab" id="tab-inv" data-tab="inv" aria-controls="p-inv" aria-selected="false" tabindex="-1">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3.5" width="14" height="17" rx="2"/><rect x="8" y="6.5" width="8" height="4" rx="1"/><path d="M12.6 12.8l-2 3h3l-2 3"/></svg>
+        <span>Inversor</span>
+      </button>
+      <button class="tab" role="tab" id="tab-bomba" data-tab="bomba" aria-controls="p-bomba" aria-selected="false" tabindex="-1">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v4"/><rect x="8.5" y="7" width="7" height="13.5" rx="2"/><path d="M8.5 12h7M10.3 16h3.4"/></svg>
+        <span>Bomba</span>
+      </button>
+      <button class="tab" role="tab" id="tab-poco" data-tab="poco" aria-controls="p-poco" aria-selected="false" tabindex="-1">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h6M15 7h6M9 7v13.5h6V7M9 15c1 .8 2 .8 3 0s2-.8 3 0"/></svg>
+        <span>Poço</span>
+      </button>
+      <button class="tab" role="tab" id="tab-clima" data-tab="clima" aria-controls="p-clima" aria-selected="false" tabindex="-1">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><path d="M9 2.5v1.6M2.5 9h1.6M4.4 4.4l1.1 1.1M13.6 4.4l-1.1 1.1M8 19.5h9a3.5 3.5 0 0 0 .3-7 4.5 4.5 0 0 0-8.6 1.3A2.9 2.9 0 0 0 8 19.5z"/></svg>
+        <span>Clima</span>
+      </button>
+    </nav>
+
+    <!-- Resultado -->
+    <div class="panel" role="tabpanel" id="p-res" aria-labelledby="tab-res">
+      <section class="sec" id="sec-result" aria-labelledby="h-result">
+        <div class="sec-h"><h2 id="h-result">Resultado do dia</h2><span class="aside" id="sky-aside">céu limpo</span></div>
+        <div class="tiles">
+          <div class="tile"><span class="k">Água no dia</span><span class="val" id="t-vol">–</span><span class="s" id="t-vol-s"></span></div>
+          <div class="tile"><span class="k">Bombeando</span><span class="val" id="t-hrs">–</span><span class="s" id="t-hrs-s"></span></div>
+          <div class="tile"><span class="k">Vazão máxima</span><span class="val" id="t-qmax">–</span><span class="s" id="t-qmax-s"></span></div>
+          <div class="tile"><span class="k">Corrente máxima</span><span class="val" id="t-imax">–</span><span class="s" id="t-imax-s"></span></div>
+        </div>
+      </section>
+
+      <section class="sec" aria-labelledby="h-checks">
+        <div class="sec-h"><h2 id="h-checks">Verificações</h2><span class="aside" id="chk-aside"></span></div>
+        <ul class="checks" id="checks"></ul>
+      </section>
+
+      <div class="btnrow">
+        <button class="btn primary" id="btn-copy">Copiar resumo</button>
+        <button class="btn" id="btn-reset">Voltar ao exemplo</button>
+        <span class="toast" id="copy-msg" role="status"></span>
       </div>
-    </section>
+      <textarea id="copy-fallback" hidden readonly style="width:100%;min-height:160px;font-family:var(--f-data);font-size:.8rem"></textarea>
 
-    <section class="sec" aria-labelledby="h-checks">
-      <div class="sec-h"><h2 id="h-checks">Verificações</h2><span class="aside" id="chk-aside"></span></div>
-      <ul class="checks" id="checks"></ul>
-    </section>
+      <details class="notes">
+        <summary>Como o simulador calcula</summary>
+        <ul>
+          <li>Sol do dia em passos de 5 minutos. A temperatura da célula sobe com o sol (NOCT), e o Voc e o Vmp caem com o calor.</li>
+          <li>Placas em série somam tensão. A corrente da string é a da placa mais fraca. Strings em paralelo somam corrente.</li>
+          <li>O inversor busca a maior frequência possível sem passar da potência das placas, da corrente de saída e da frequência máxima.</li>
+          <li>Sem boost, a tensão máxima na bomba é cerca de 0,72 × a tensão das placas. Abaixo de ~306 V ele não chega a 220 V e a corrente sobe.</li>
+          <li>A bomba segue as leis de afinidade: vazão proporcional à frequência, altura ao quadrado, potência ao cubo.</li>
+          <li>Altura do sistema = nível dinâmico + altura de entrega + perda no tubo (Hazen-Williams, +10% de conexões). O rebaixamento vem do teste do poço.</li>
+          <li>É um modelo de engenharia pra comparar cenários. Confira os números com medição em campo: corrente no display e vazão no hidrômetro.</li>
+        </ul>
+      </details>
+    </div>
 
-    <section class="sec" aria-labelledby="h-day">
-      <div class="sec-h"><h2 id="h-day">Ao longo do dia</h2><span class="aside">toque no gráfico pra ver a hora no 3D</span></div>
-      <div class="chartbox" id="daybox">
-        <div class="legend" id="day-legend"></div>
-        <canvas id="daychart" height="460" aria-label="Gráficos de potência, frequência, vazão e corrente ao longo do dia"></canvas>
-        <div class="tip" id="daytip" hidden></div>
+    <!-- Gráficos -->
+    <div class="panel" role="tabpanel" id="p-graf" aria-labelledby="tab-graf" hidden>
+      <section class="sec" aria-labelledby="h-day">
+        <div class="sec-h"><h2 id="h-day">Ao longo do dia</h2><span class="aside">toque no gráfico pra ver a hora no 3D</span></div>
+        <div class="chartbox" id="daybox">
+          <div class="legend" id="day-legend"></div>
+          <canvas id="daychart" height="460" aria-label="Gráficos de potência, frequência, vazão e corrente ao longo do dia"></canvas>
+          <div class="tip" id="daytip" hidden></div>
+        </div>
+        <div><button class="linkbtn" id="btn-table" aria-expanded="false">Ver tabela hora a hora</button></div>
+        <div class="tablewrap" id="hourwrap" hidden><table id="hourtable"></table></div>
+      </section>
+
+      <section class="sec" aria-labelledby="h-pump">
+        <div class="sec-h"><h2 id="h-pump">Curva da bomba × sistema</h2><span class="aside" id="pump-aside"></span></div>
+        <div class="chartbox">
+          <div class="legend" id="pump-legend"></div>
+          <canvas id="pumpchart" height="280" aria-label="Curva altura por vazão da bomba e curva do sistema"></canvas>
+        </div>
+      </section>
+    </div>
+
+    <!-- Placas -->
+    <div class="panel" role="tabpanel" id="p-placas" aria-labelledby="tab-placas" hidden>
+      <div class="blk">
+        <div class="hd"><h2>Suas placas</h2><span class="sum" id="sum-opts"></span></div>
+        <div class="in">
+          <div class="fields">
+            <label class="fld"><span>Placas que você tem</span><div class="ig"><input id="in-avail" data-path="avail" data-int inputmode="numeric" autocomplete="off"><i>placas</i></div></label>
+          </div>
+          <p class="hint" id="opt-rec"></p>
+          <div class="opts" id="otbody"></div>
+          <p class="hint">Água no dia com céu limpo e com céu nublado, usando a placa da etiqueta abaixo e o resto dos seus dados.</p>
+        </div>
       </div>
-      <div><button class="linkbtn" id="btn-table" aria-expanded="false">Ver tabela hora a hora</button></div>
-      <div class="tablewrap" id="hourwrap" hidden><table id="hourtable"></table></div>
-    </section>
 
-    <section class="sec" aria-labelledby="h-pump">
-      <div class="sec-h"><h2 id="h-pump">Curva da bomba × sistema</h2><span class="aside" id="pump-aside"></span></div>
-      <div class="chartbox">
-        <div class="legend" id="pump-legend"></div>
-        <canvas id="pumpchart" height="280" aria-label="Curva altura por vazão da bomba e curva do sistema"></canvas>
-      </div>
-    </section>
-
-    <section class="sec" aria-labelledby="h-data">
-      <div class="sec-h"><h2 id="h-data">Seus dados</h2><span class="aside">tudo recalcula na hora</span></div>
-
-      <details class="blk" id="blk-placas" open>
-        <summary><h2>Placas e ligação</h2><span class="sum" id="sum-placas"></span></summary>
+      <div class="blk" id="blk-placas">
+        <div class="hd"><h2>Placas e ligação</h2><span class="sum" id="sum-placas"></span></div>
         <div class="in">
           <div class="fields">
             <label class="fld"><span>Placas em série <em>(por string)</em></span><div class="ig"><input id="in-nserie" data-path="nSeries" data-int inputmode="numeric" autocomplete="off"><i>placas</i></div></label>
@@ -339,10 +436,13 @@ td{font-family:var(--f-data);font-variant-numeric:tabular-nums}
             </div>
           </details>
         </div>
-      </details>
+      </div>
+    </div>
 
-      <details class="blk" id="blk-inv">
-        <summary><h2>Inversor</h2><span class="sum" id="sum-inv"></span></summary>
+    <!-- Inversor -->
+    <div class="panel" role="tabpanel" id="p-inv" aria-labelledby="tab-inv" hidden>
+      <div class="blk" id="blk-inv">
+        <div class="hd"><h2>Inversor</h2><span class="sum" id="sum-inv"></span></div>
         <div class="in">
           <p class="hint">Valores da etiqueta do TE380-2S-2P2G-L. Frequências conforme o que estiver programado nele.</p>
           <div class="fields">
@@ -357,10 +457,13 @@ td{font-family:var(--f-data);font-variant-numeric:tabular-nums}
           <label class="toggle"><input type="checkbox" id="in-ilim" data-path="inv.limitI"><span>Segurar a corrente no limite do inversor<small>Ligado: ele baixa a frequência pra não passar de 10 A. Desligado: roda solto e desarma por sobrecarga quando passa.</small></span></label>
           <label class="toggle"><input type="checkbox" id="in-boost" data-path="inv.boost"><span>Tem boost interno<small>Só ligue se o manual ou o vendedor confirmar. Com boost, ele dá 220 V na bomba mesmo com as placas abaixo de ~306 V.</small></span></label>
         </div>
-      </details>
+      </div>
+    </div>
 
-      <details class="blk" id="blk-pump">
-        <summary><h2>Bomba</h2><span class="sum" id="sum-pump"></span></summary>
+    <!-- Bomba -->
+    <div class="panel" role="tabpanel" id="p-bomba" aria-labelledby="tab-bomba" hidden>
+      <div class="blk" id="blk-pump">
+        <div class="hd"><h2>Bomba</h2><span class="sum" id="sum-pump"></span></div>
         <div class="in">
           <p class="hint">Motor pela etiqueta (OM4A, 3 HP, 220 V trifásico, Imax 11,7 A). A curva depende do bombeador, a parte de cima da bomba, que tem etiqueta própria (ex.: 4BPL3-16).</p>
           <div class="fields">
@@ -379,10 +482,13 @@ td{font-family:var(--f-data);font-variant-numeric:tabular-nums}
             </div>
           </details>
         </div>
-      </details>
+      </div>
+    </div>
 
-      <details class="blk" id="blk-well">
-        <summary><h2>Poço e tubulação</h2><span class="sum" id="sum-well"></span></summary>
+    <!-- Poço -->
+    <div class="panel" role="tabpanel" id="p-poco" aria-labelledby="tab-poco" hidden>
+      <div class="blk" id="blk-well">
+        <div class="hd"><h2>Poço e tubulação</h2><span class="sum" id="sum-well"></span></div>
         <div class="in">
           <div class="fields">
             <label class="fld"><span>Profundidade do poço</span><div class="ig"><input id="in-wd" data-path="well.depth" inputmode="decimal"><i>m</i></div></label>
@@ -404,10 +510,13 @@ td{font-family:var(--f-data);font-variant-numeric:tabular-nums}
             <label class="fld"><span>Caixa d'água</span><div class="ig"><input id="in-tank" data-path="well.tank" inputmode="decimal"><i>m³</i></div></label>
           </div>
         </div>
-      </details>
+      </div>
+    </div>
 
-      <details class="blk" id="blk-day">
-        <summary><h2>Clima do dia</h2><span class="sum" id="sum-day"></span></summary>
+    <!-- Clima -->
+    <div class="panel" role="tabpanel" id="p-clima" aria-labelledby="tab-clima" hidden>
+      <div class="blk" id="blk-day">
+        <div class="hd"><h2>Clima do dia</h2><span class="sum" id="sum-day"></span></div>
         <div class="in">
           <div class="seg" id="seg-sky" role="group" aria-label="Condição do céu">
             <button data-sky="clear" aria-pressed="true">Céu limpo</button>
@@ -421,28 +530,9 @@ td{font-family:var(--f-data);font-variant-numeric:tabular-nums}
             <label class="fld"><span>Pôr do sol</span><div class="ig"><input id="in-set" data-path="day.sunset" data-time inputmode="numeric"><i>h</i></div></label>
           </div>
         </div>
-      </details>
-
-      <div class="btnrow">
-        <button class="btn primary" id="btn-copy">Copiar resumo</button>
-        <button class="btn" id="btn-reset">Voltar ao exemplo</button>
-        <span class="toast" id="copy-msg" role="status"></span>
       </div>
-      <textarea id="copy-fallback" hidden readonly style="width:100%;min-height:160px;font-family:var(--f-data);font-size:.8rem"></textarea>
-    </section>
+    </div>
 
-    <section class="sec notes" aria-labelledby="h-notes">
-      <div class="sec-h"><h2 id="h-notes">Como o simulador calcula</h2></div>
-      <ul>
-        <li>Sol do dia em passos de 5 minutos. A temperatura da célula sobe com o sol (NOCT), e o Voc e o Vmp caem com o calor.</li>
-        <li>Placas em série somam tensão. A corrente da string é a da placa mais fraca. Strings em paralelo somam corrente.</li>
-        <li>O inversor busca a maior frequência possível sem passar da potência das placas, da corrente de saída e da frequência máxima.</li>
-        <li>Sem boost, a tensão máxima na bomba é cerca de 0,72 × a tensão das placas. Abaixo de ~306 V ele não chega a 220 V e a corrente sobe.</li>
-        <li>A bomba segue as leis de afinidade: vazão proporcional à frequência, altura ao quadrado, potência ao cubo.</li>
-        <li>Altura do sistema = nível dinâmico + altura de entrega + perda no tubo (Hazen-Williams, +10% de conexões). O rebaixamento vem do teste do poço.</li>
-        <li>É um modelo de engenharia pra comparar cenários. Confira os números com medição em campo: corrente no display e vazão no hidrômetro.</li>
-      </ul>
-    </section>
   </div>
 </main>
 
@@ -1252,10 +1342,10 @@ const parseHM = (s) => { const m = String(s).trim().match(/^(\d{1,2})(?:[:h.,](\
 const hm = (h) => { let H = Math.floor(h + 1e-6), mm = Math.round((h - H) * 60); if (mm === 60) { H++; mm = 0; } return String(H).padStart(2, '0') + ':' + String(mm).padStart(2, '0'); };
 const clone = (o) => JSON.parse(JSON.stringify(o));
 
-const STORE = 'bombeamento-solar-3d:v1';
+const STORE = 'bombeamento-solar-3d:v1', TAB_STORE = 'bombeamento-solar-3d:aba';
 const DEF_CURVE = [[0, 168], [1, 163], [2, 152], [3, 136], [4, 114], [5, 86], [6, 52]];
 const DEF = {
-  nSeries: 8, nStrings: 1, std: { w: 550, vmp: 41.7, voc: 49.6 },
+  avail: 12, nSeries: 8, nStrings: 1, std: { w: 550, vmp: 41.7, voc: 49.6 },
   panels: Array.from({ length: 8 }, () => ({ w: 550, vmp: 41.7, voc: 49.6 })),
   pv: { bVoc: -0.28, bVmp: -0.39, iscRatio: 1.06, noct: 45, tMinYear: 18 },
   inv: { vdcMin: 150, vdcMax: 450, iNom: 10, vOut: 220, fMax: 60, fMin: 30, boost: false, limitI: true, dist: 10 },
@@ -1264,7 +1354,7 @@ const DEF = {
   day: { sky: 'clear', gMax: 1000, tMin: 22, tMax: 31, sunrise: '5:15', sunset: '17:40' }
 };
 const RANGES = {
-  nSeries: [1, 30], nStrings: [1, 4], 'std.w': [10, 1000], 'std.vmp': [5, 90], 'std.voc': [5, 100],
+  avail: [1, 60], nSeries: [1, 30], nStrings: [1, 4], 'std.w': [10, 1000], 'std.vmp': [5, 90], 'std.voc': [5, 100],
   'pv.bVoc': [-0.7, 0], 'pv.bVmp': [-0.8, 0], 'pv.iscRatio': [1.01, 1.3], 'pv.noct': [30, 65], 'pv.tMinYear': [-10, 35],
   'inv.vdcMin': [30, 800], 'inv.vdcMax': [60, 1000], 'inv.iNom': [1, 200], 'inv.vOut': [100, 480], 'inv.fMax': [30, 70], 'inv.fMin': [5, 60], 'inv.dist': [0, 1000],
   'pump.hp': [0.3, 40], 'pump.v': [100, 480], 'pump.iMax': [0.5, 200], 'pump.effMotor': [40, 95], 'pump.etaBep': [20, 85],
@@ -1282,6 +1372,8 @@ function load() {
     if (raw) {
       const s = JSON.parse(raw), out = clone(DEF);
       for (const k of Object.keys(DEF)) if (s[k] !== undefined) out[k] = (typeof DEF[k] === 'object' && !Array.isArray(DEF[k])) ? Object.assign({}, DEF[k], s[k]) : s[k];
+      // Versão anterior (sem "placas que você tem"): começa na ligação recomendada pras 12 placas, 8 em série
+      if (s.avail === undefined) { out.nSeries = 8; out.nStrings = 1; out.panels = Array.from({ length: 8 }, () => Object.assign({}, out.std)); }
       if (Array.isArray(out.panels) && out.panels.length) return out;
     }
   } catch (e) { /* armazenamento indisponível */ }
@@ -1521,6 +1613,7 @@ function renderChecks() {
   $('#chk-aside').textContent = nb + nw ? `${nb ? nb + ' problema' + (nb > 1 ? 's' : '') : ''}${nb && nw ? ' · ' : ''}${nw ? nw + ' atenç' + (nw > 1 ? 'ões' : 'ão') : ''}` : 'tudo certo';
   const da = $('#dk-alerts'); da.dataset.l = nb ? 'bad' : nw ? 'warn' : 'ok';
   da.textContent = nb + nw ? `${nb + nw} aviso${nb + nw > 1 ? 's' : ''}` : 'tudo certo';
+  const bd = $('#tab-badge'); bd.hidden = !(nb + nw); bd.textContent = nb + nw; bd.dataset.l = nb ? 'bad' : 'warn';
 }
 
 function renderTiles() {
@@ -1604,7 +1697,7 @@ function dayPanels() {
   ];
 }
 function drawDay() {
-  if (!RES) return;
+  if (!RES || !$('#daychart').clientWidth) return;
   const cv = $('#daychart'), P = dayPanels(), H = DAY.top + P.length * (DAY.ph + DAY.gap) + 4;
   const { g, w } = prep(cv, H), T = tokens(), S = RES.steps;
   const X = (t) => DAY.pl + (t - DAY.x0) / (DAY.x1 - DAY.x0) * (w - DAY.pl - DAY.pr);
@@ -1671,7 +1764,7 @@ function dayTip(e) {
 function hideTip() { $('#daytip').hidden = true; if (DAY.hover != null) { DAY.hover = null; drawDay(); } }
 
 function drawPump(st) {
-  if (!RES) return;
+  if (!RES || !$('#pumpchart').clientWidth) return;
   const cv = $('#pumpchart'), { g, w, h } = prep(cv, 270), T = tokens(), ctx = RES.ctx, C = ctx.curve, W = ctx.W;
   const pl = 44, pr = 14, pt = 10, pb = 30, qM = niceMax(C.qEnd * 1.05), hM = niceMax(C.h0 * 1.08);
   const X = (q) => pl + q / qM * (w - pl - pr), Y = (v) => h - pb - Math.max(0, Math.min(1.03, v / hM)) * (h - pt - pb);
@@ -1724,6 +1817,7 @@ function recompute(first) {
   CHK = buildChecks(nn, R, REF);
   renderTiles(); renderChecks(); renderSums(); renderLegends(); drawWiring(nn.N, REF);
   if (!$('#hourwrap').hidden) renderHours();
+  if (curTab === 'placas') renderOptions();
   const weak = (REF.iMaxP - REF.iMinP) / REF.iMaxP > 0.03 ? REF.weak : -1;
   const N = nn.N, th = Math.min(Math.max(N.well.hDest, 1.2), 8);
   const sig = JSON.stringify([N.nSeries, N.nStrings, N.well.depth, N.well.pumpDepth, N.well.ne, th, weak]);
@@ -1783,11 +1877,135 @@ function tick(ts) {
   if (V3.ok && vpVisible) V3.frame(dt, rdt);
 }
 
+// ===== Opções de ligação com as placas que você tem =====
+let OPT_SIG = '', OPT_T = null;
+function optionList(N, avail) {
+  const p = ST.std, P = N.pv;
+  const vocColdP = p.voc * (1 + P.bVoc / 100 * (P.tMinYear - 25));
+  const maxSafe = Math.max(1, Math.floor(N.inv.vdcMax / vocColdP));
+  const L = [];
+  if (avail > maxSafe) L.push({ ns: Math.min(avail, 30), np: 1 }); // tudo em série, pra mostrar por que não
+  for (let np = 1; np <= 4; np++) {
+    const ns = Math.min(Math.floor(avail / np), maxSafe);
+    if (ns >= 1 && !L.some(o => o.ns === ns && o.np === np)) L.push({ ns, np });
+  }
+  return { L, maxSafe };
+}
+function evalOption(N, o) {
+  const panels = Array.from({ length: o.ns }, () => ({ w: ST.std.w, vmp: ST.std.vmp, voc: ST.std.voc }));
+  const base = Object.assign({}, N, { nSeries: o.ns, nStrings: o.np, panels });
+  const run = (sky) => SIM.runDay(Object.assign({}, base, { day: Object.assign({}, N.day, { sky }) }));
+  const A = run('clear'), B = run('overcast');
+  if (!A || !B) return null;
+  const r = SIM.refs(base, A.ctx), inv = N.inv;
+  let l = 'ok', t;
+  if (r.vocCold > inv.vdcMax) { l = 'bad'; t = `Passa de ${fmt(inv.vdcMax, 0)} V no frio (${fmt(r.vocCold, 0)} V): queima o inversor`; }
+  else if (r.vmpHot < inv.vdcMin) { l = 'bad'; t = `Tensão baixa demais (${fmt(r.vmpHot, 0)} V)`; }
+  else if (!inv.boost && A.sm.voltLimMin > 60) { l = 'warn'; t = `Tensão baixa: motor com ~${fmt(Math.min(inv.vOut, r.vmpHot * SIM.KV), 0)} V em vez de ${fmt(inv.vOut, 0)} V, esquenta`; }
+  else if (r.pStc < r.full.Pdc) { l = 'warn'; t = 'Pouca placa pra bomba'; }
+  else t = `Motor com tensão cheia · ${fmt(r.vmpHot, 0)} a ${fmt(r.vocCold, 0)} V`;
+  return Object.assign({}, o, { l, t, kwp: r.pStc / 1000, vol: A.sm.vol, volO: B.sm.vol });
+}
+const OPT_MARK = { ok: '✓', warn: '!', bad: '✕' };
+function markCurrent() {
+  document.querySelectorAll('#otbody .opt').forEach(tr => {
+    const cur = +tr.dataset.ns === ST.nSeries && +tr.dataset.np === ST.nStrings, b = tr.querySelector('.use');
+    tr.classList.toggle('cur', cur);
+    if (b) { b.disabled = cur; b.textContent = cur ? 'Em uso' : 'Usar'; }
+  });
+}
+function renderOptions() {
+  if (!NN) return;
+  const N = NN.N, avail = ST.avail;
+  const sig = JSON.stringify([avail, ST.std, N.pv, N.inv, N.pump, N.well, N.day.gMax, N.day.tMin, N.day.tMax, N.day.tr, N.day.ts]);
+  $('#sum-opts').textContent = `${avail} placas de ${fmt(ST.std.w, 0)} W`;
+  if (sig === OPT_SIG) { markCurrent(); return; }
+  clearTimeout(OPT_T);
+  $('#opt-rec').textContent = 'Calculando as opções…';
+  OPT_T = setTimeout(() => {
+    OPT_SIG = sig;
+    const { L, maxSafe } = optionList(N, avail);
+    const rows = L.map(o => evalOption(N, o)).filter(Boolean);
+    const best = (lv) => rows.filter(r => r.l === lv).sort((a, b) => b.vol - a.vol)[0];
+    const rec = best('ok') || best('warn');
+    const name = (r) => `${r.ns} em série${r.np > 1 ? ' × ' + r.np + ' strings' : ''}`;
+    $('#otbody').innerHTML = rows.map(r => {
+      const left = avail - r.ns * r.np;
+      return `<div class="opt${r === rec ? ' rec' : ''}" data-ns="${r.ns}" data-np="${r.np}">` +
+        `<div class="nm">${name(r)}${r === rec ? '<span class="pill">Melhor</span>' : ''}<small>usa ${r.ns * r.np}${left ? ', sobram ' + left : ''}</small></div>` +
+        `<div>${r.l === 'bad' ? '' : '<button class="use">Usar</button>'}</div>` +
+        `<div class="nums"><span>${fmt(r.kwp, 2)} kWp</span><span>sol <b>${fmt(r.vol, 1)} m³</b></span><span>nublado <b>${fmt(r.volO, 1)} m³</b></span></div>` +
+        `<div class="st" data-l="${r.l}"><i>${OPT_MARK[r.l]}</i>${r.t}</div></div>`;
+    }).join('');
+    let txt;
+    if (!rec) txt = 'Nenhuma ligação boa com essas placas e esse inversor. Confira os dados da placa e do inversor.';
+    else {
+      const left = avail - rec.ns * rec.np;
+      txt = `Melhor com ${avail} placas: <b>${name(rec)}</b>, ${fmt(rec.vol, 1)} m³ num dia de sol.`;
+      if (rows.some(r => r.l === 'bad' && r.np === 1 && r.ns > maxSafe)) txt += ` Mais de ${maxSafe} em série passa dos ${fmt(N.inv.vdcMax, 0)} V do inversor nas manhãs frias.`;
+      const more = rows.filter(r => r.l === 'warn' && r.vol > rec.vol + 0.05).sort((a, b) => b.vol - a.vol)[0];
+      if (more) txt += ` ${name(more)} tira ${fmt(more.vol - rec.vol, 1)} m³ a mais, mas deixa o motor com tensão baixa: esquenta e dura menos.`;
+      if (left > 0) txt += rec.np === 1 && 2 * rec.ns > avail
+        ? ` As ${left} que sobram ficam de reserva; com mais ${2 * rec.ns - avail} dá pra fazer 2 strings de ${rec.ns}.`
+        : ` Sobram ${left} de reserva.`;
+    }
+    $('#opt-rec').innerHTML = txt;
+    markCurrent();
+  }, 60);
+}
+
+// ===== Abas =====
+const TABS = ['res', 'graf', 'placas', 'inv', 'bomba', 'poco', 'clima'];
+let curTab = 'res';
+function showTab(id, focus) {
+  if (!TABS.includes(id)) id = 'res';
+  curTab = id;
+  document.querySelectorAll('.tab').forEach(b => {
+    const on = b.dataset.tab === id;
+    b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1;
+    if (on) {
+      if (focus) b.focus({ preventScroll: true });
+      const bar = b.parentNode; // rola só a barra de abas, nunca a página
+      if (b.offsetLeft < bar.scrollLeft) bar.scrollLeft = b.offsetLeft - 4;
+      else if (b.offsetLeft + b.offsetWidth > bar.scrollLeft + bar.clientWidth) bar.scrollLeft = b.offsetLeft + b.offsetWidth - bar.clientWidth + 4;
+    }
+  });
+  document.querySelectorAll('.panel').forEach(p => { p.hidden = p.id !== 'p-' + id; });
+  try { localStorage.setItem(TAB_STORE, id); } catch (e) { /* sem armazenamento */ }
+  if (!RES) return;
+  if (id === 'graf') { drawDay(); drawPump(stepAt(curT)); }
+  if (id === 'placas') { drawWiring(NN.N, REF); renderOptions(); }
+}
+function bindTabs() {
+  const bar = $('#tabs');
+  bar.addEventListener('click', (e) => {
+    const b = e.target.closest('.tab'); if (!b) return;
+    // com a barra grudada no topo, volta pro começo da aba nova
+    const y = $('.col-info').getBoundingClientRect().top + window.scrollY - (window.innerWidth >= 1000 ? 12 : 0);
+    showTab(b.dataset.tab);
+    if (window.scrollY > y) window.scrollTo({ top: y });
+  });
+  bar.addEventListener('keydown', (e) => {
+    const i = TABS.indexOf(curTab), k = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+    if (k) { e.preventDefault(); showTab(TABS[(i + k + TABS.length) % TABS.length], true); }
+    else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); showTab(TABS[e.key === 'Home' ? 0 : TABS.length - 1], true); }
+  });
+  $('#otbody').addEventListener('click', (e) => {
+    const b = e.target.closest('.use'), tr = b && b.closest('.opt'); if (!tr) return;
+    const ns = +tr.dataset.ns, np = +tr.dataset.np;
+    ST.nSeries = ns; ST.nStrings = np; ST.panels = Array.from({ length: ns }, () => Object.assign({}, ST.std));
+    fillInputs(); changed();
+  });
+  let saved = null;
+  try { saved = localStorage.getItem(TAB_STORE); } catch (e) { /* sem armazenamento */ }
+  showTab(saved);
+}
+
 function summaryText() {
   const N = NN.N, sm = RES.sm, p0 = N.panels[0], same = N.panels.every(p => p.w === p0.w && p.vmp === p0.vmp && p.voc === p0.voc);
   const L = [];
   L.push(`SIMULAÇÃO BOMBEAMENTO SOLAR (${SKY_TXT[N.day.sky]}, ${fmt(N.day.tMin, 0)}–${fmt(N.day.tMax, 0)} °C)`);
-  L.push(`Placas: ${N.nSeries} em série${N.nStrings > 1 ? ' × ' + N.nStrings + ' strings' : ''} = ${fmt(REF.pStc / 1000, 2)} kWp` + (same ? ` (${fmt(p0.w, 0)} W, Vmp ${fmt(p0.vmp, 1)} V, Voc ${fmt(p0.voc, 1)} V)` : ' (placas diferentes)'));
+  L.push(`Placas: ${N.nSeries} em série${N.nStrings > 1 ? ' × ' + N.nStrings + ' strings' : ''} = ${fmt(REF.pStc / 1000, 2)} kWp (de ${ST.avail} disponíveis)` + (same ? ` (${fmt(p0.w, 0)} W, Vmp ${fmt(p0.vmp, 1)} V, Voc ${fmt(p0.voc, 1)} V)` : ' (placas diferentes)'));
   L.push(`String: Vmp ${fmt(REF.sumVmp, 0)} V / Voc ${fmt(REF.sumVoc, 0)} V · Voc manhã fria ${fmt(REF.vocCold, 0)} V · Vmp meio-dia ${fmt(REF.vmpHot, 0)} V`);
   L.push(`Inversor: ${fmt(N.inv.vdcMin, 0)}–${fmt(N.inv.vdcMax, 0)} V DC, ${fmt(N.inv.iNom, 0)} A, ${fmt(N.inv.fMin, 0)}–${fmt(N.inv.fMax, 0)} Hz, boost ${N.inv.boost ? 'sim' : 'não'}, limite de corrente ${N.inv.limitI ? 'sim' : 'não'}`);
   L.push(`Bomba: ${fmt(N.pump.hp, 1)} HP ${fmt(N.pump.v, 0)} V trifásica, Imax ${fmt(N.pump.iMax, 1)} A · ${ST.pump.preset === 'custom' ? 'curva informada' : 'curva estimada 4BPL3-16'}: ` + N.pump.curve.map(([q, h]) => `${fmt(q, 1)}/${fmt(h, 0)}`).join(' '));
@@ -1805,6 +2023,7 @@ function init() {
   else V3.resize(vp.clientWidth, vp.clientHeight);
   V3.curView = 'geral';
   recompute(true);
+  bindTabs();
   document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => {
     document.querySelectorAll('[data-view]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
     V3.view(b.dataset.view);
