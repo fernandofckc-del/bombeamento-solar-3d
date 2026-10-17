@@ -236,6 +236,14 @@ td{font-family:var(--f-data);font-variant-numeric:tabular-nums}
 .opt .st[data-l="ok"] i{color:var(--good)} .opt .st[data-l="warn"] i{color:#9a6400} .opt .st[data-l="bad"] i{color:var(--bad)}
 .opt .use{border:1px solid var(--line);background:var(--surface-2);border-radius:7px;padding:6px 12px;font-size:.8rem;font-weight:600;cursor:pointer;min-height:34px}
 .opt .use[disabled]{opacity:.55;cursor:default}
+.pos{color:var(--wire-pos);font-weight:700}.neg{color:var(--ink);font-weight:700}
+.sp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.sp>div{background:var(--surface-2);border:1px solid var(--line-2);border-radius:10px;padding:9px 11px;font-size:.82rem;line-height:1.45;color:var(--ink-2)}
+.sp b{color:var(--ink)}
+.howto{background:var(--surface-2);border:1px solid var(--line-2);border-radius:10px;padding:10px 12px 4px}
+.howto h3{font-size:1.02rem;text-transform:uppercase;letter-spacing:.04em}
+.steps{margin:8px 0 6px;padding-left:20px;display:grid;gap:7px;font-size:.86rem;line-height:1.45;color:var(--ink-2)}
+.steps b{color:var(--ink)}
 .pill{display:inline-block;font:700 .6rem/1 var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--good);border-radius:999px;padding:3px 6px;margin-left:6px;vertical-align:2px}
 .toast{font-size:.84rem;color:var(--good);font-weight:500}
 
@@ -401,6 +409,11 @@ td{font-family:var(--f-data);font-variant-numeric:tabular-nums}
           <div class="fields">
             <label class="fld"><span>Placas que você tem</span><div class="ig"><input id="in-avail" data-path="avail" data-int inputmode="numeric" autocomplete="off"><i>placas</i></div></label>
           </div>
+          <div class="sp">
+            <div><b>Série</b> <span class="pos">+</span>→<span class="neg">−</span>→<span class="pos">+</span>→<span class="neg">−</span><br>Uma placa atrás da outra. <b>Soma a tensão (V).</b></div>
+            <div><b>Paralelo</b> <span class="pos">+</span> com <span class="pos">+</span>, <span class="neg">−</span> com <span class="neg">−</span><br>Grupos lado a lado. <b>Soma a corrente (A)</b>, a tensão não sobe.</div>
+          </div>
+          <p class="hint">O motor de 220 V precisa de uns 306 V das placas, por isso aqui o que manda é a série. “6 × 2” quer dizer 2 grupos de 6 placas em série, ligados em paralelo.</p>
           <p class="hint" id="opt-rec"></p>
           <div class="opts" id="otbody"></div>
           <p class="hint">Água no dia com céu limpo e com céu nublado, usando a placa da etiqueta abaixo e o resto dos seus dados.</p>
@@ -425,6 +438,10 @@ td{font-family:var(--f-data);font-variant-numeric:tabular-nums}
           <h3 style="font-size:1.02rem;text-transform:uppercase;letter-spacing:.04em">Esquema de ligação</h3>
           <div class="wiring" id="wiring"></div>
           <p class="hint" id="wiring-note"></p>
+          <div class="howto">
+            <h3>Como ligar, passo a passo</h3>
+            <ol class="steps" id="wiring-steps"></ol>
+          </div>
           <details class="adv">
             <summary>Ajustes finos das placas</summary>
             <div class="fields">
@@ -1506,6 +1523,7 @@ function fillCurveTable() {
 
 // --- esquema de ligação (SVG): placas em cobrinha, inversor à direita (tela larga) ou embaixo (celular) ---
 function drawWiring(N, ref) {
+  if (N.nStrings > 1) { drawWiringPar(N, ref); return; }
   const box = $('#wiring'), cw = Math.max(260, (box.clientWidth || 320) - 16);
   const n = N.nSeries, pw = 48, ph = 62, gx = 16, gy = 32, ox = 30, oy = 26;
   const wide = cw >= 560;
@@ -1552,9 +1570,61 @@ function drawWiring(N, ref) {
     s += `<text class="it" x="${pvp}" y="${invY + 13}" text-anchor="middle">PV+</text><text class="it" x="${pvn}" y="${invY + 13}" text-anchor="middle">PV−</text>`;
     s += `<text class="ib" x="${ix + iw + 10}" y="${invY + 18}">Vmp ${fmt(ref.sumVmp, 0)} V</text><text class="lb" x="${ix + iw + 10}" y="${invY + 34}">Voc ${fmt(ref.sumVoc, 0)} V</text>`;
   }
-  const note = N.nStrings > 1 ? `Mostrando 1 de ${N.nStrings} strings iguais em paralelo: a tensão fica a mesma e a corrente soma.` : 'Bolinha vermelha é o +, preta é o −. Em série a tensão soma e a corrente é a mesma em todas: quem manda é a placa mais fraca.';
   box.innerHTML = s + '</svg>';
-  $('#wiring-note').textContent = note;
+  $('#wiring-note').textContent = 'Bolinha vermelha é o +, preta é o −. Em série a tensão soma e a corrente é a mesma em todas: quem manda é a placa mais fraca.';
+  renderSteps(N, ref);
+}
+// Strings em paralelo: cada string numa linha, os + juntos num fio à esquerda e os − juntos à direita
+const WIRE_CSS = '<style>.pv{fill:var(--pv)}.pt{fill:var(--pv-ink);font:600 12px var(--f-body)}.pv2{fill:var(--pv-ink);font:500 10px var(--f-data)}.lb{fill:var(--ink-2);font:500 10.5px var(--f-data)}.sl{fill:var(--ink);font:600 11.5px var(--f-body)}.wj{stroke:var(--ink-2);stroke-width:2;fill:none;stroke-linejoin:round}.wp{stroke:var(--wire-pos);stroke-width:2.4;fill:none;stroke-linejoin:round}.wn{stroke:var(--wire-neg);stroke-width:2.4;fill:none;stroke-linejoin:round}.dp{fill:var(--wire-pos)}.dn{fill:var(--wire-neg)}.inv{fill:var(--accent)}.it{fill:#fff;font:600 10.5px var(--f-body)}.ib{fill:var(--ink);font:600 11px var(--f-data)}</style>';
+function drawWiringPar(N, ref) {
+  const box = $('#wiring'), n = N.nSeries, m = N.nStrings, L = 'ABCD';
+  const pw = 44, ph = 52, gx = 12, gy = 44, ox = 46, oy = 30;
+  const rowW = n * pw + (n - 1) * gx, busP = ox - 24, busN = ox + rowW + 24;
+  const ym = (s) => oy + s * (ph + gy) + ph / 2, yLast = ym(m - 1), invY = yLast + ph / 2 + 58;
+  const W = busN + 30, H = invY + 76;
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Esquema: ${m} strings de ${n} placas em série, ligadas em paralelo no inversor">` + WIRE_CSS;
+  let wires = '', boxes = '';
+  for (let k = 0; k < m; k++) {
+    const y0 = oy + k * (ph + gy), y = ym(k), xL = ox, xR = ox + rowW;
+    boxes += `<text class="sl" x="${ox}" y="${y0 - 8}">String ${L[k]} · ${n} em série · ${fmt(ref.sumVmp, 0)} V</text>`;
+    for (let i = 0; i < n; i++) {
+      const p = N.panels[i], x = ox + i * (pw + gx);
+      if (i < n - 1) wires += `<path class="wj" d="M${x + pw} ${y} H${x + pw + gx}"/>`;
+      boxes += `<rect class="pv" x="${x}" y="${y0}" width="${pw}" height="${ph}" rx="4"/>`;
+      boxes += `<text class="pt" x="${x + pw / 2}" y="${y0 + 18}" text-anchor="middle">${L[k]}${i + 1}</text>`;
+      boxes += `<text class="pv2" x="${x + pw / 2}" y="${y0 + 36}" text-anchor="middle">${fmt(p.vmp, 1)}V</text>`;
+      boxes += `<circle class="dp" cx="${x}" cy="${y}" r="3.6"/><circle class="dn" cx="${x + pw}" cy="${y}" r="3.6"/>`;
+    }
+    wires += `<path class="wp" d="M${xL} ${y} H${busP}"/><path class="wn" d="M${xR} ${y} H${busN}"/>`;
+    if (k > 0) boxes += `<circle class="dp" cx="${busP}" cy="${y}" r="5"/><circle class="dn" cx="${busN}" cy="${y}" r="5"/>`;
+  }
+  const iL = busP - 14, iR = busN + 14, pvp = busP, pvn = busN;
+  wires += `<path class="wp" d="M${busP} ${ym(0)} V${invY}"/><path class="wn" d="M${busN} ${ym(0)} V${invY}"/>`;
+  boxes += `<text class="lb" x="${busP + 8}" y="${yLast + ph / 2 + 22}">junta todos os +</text>`;
+  boxes += `<text class="lb" x="${busN - 8}" y="${yLast + ph / 2 + 22}" text-anchor="end">junta todos os −</text>`;
+  s += wires + boxes;
+  s += `<rect class="inv" x="${iL}" y="${invY}" width="${iR - iL}" height="44" rx="6"/><text class="it" x="${(iL + iR) / 2}" y="${invY + 28}" text-anchor="middle">INVERSOR</text>`;
+  s += `<text class="it" x="${pvp}" y="${invY + 14}" text-anchor="middle">PV+</text><text class="it" x="${pvn}" y="${invY + 14}" text-anchor="middle">PV−</text>`;
+  s += `<text class="ib" x="${(iL + iR) / 2}" y="${invY + 62}" text-anchor="middle">Vmp ${fmt(ref.sumVmp, 0)} V · Voc ${fmt(ref.sumVoc, 0)} V · corrente × ${m}</text>`;
+  box.innerHTML = s + '</svg>';
+  $('#wiring-note').textContent = `Bolinha vermelha é o +, preta é o −. Em paralelo a tensão fica a mesma de uma string só e a corrente soma (× ${m}).`;
+  renderSteps(N, ref);
+}
+// Passo a passo em linguagem simples, conforme a ligação escolhida
+function renderSteps(N, ref) {
+  const n = N.nSeries, m = N.nStrings, voc = fmt(ref.sumVoc, 0), last = `P${n}`, st = [];
+  if (m === 1) {
+    st.push(`<b>Ligue as placas uma atrás da outra (série):</b> o <span class="neg">−</span> de uma placa vai no <span class="pos">+</span> da próxima. P1 → P2 → … → ${last}.`);
+    st.push(`Sobram dois fios soltos: o <span class="pos">+</span> da P1 e o <span class="neg">−</span> da ${last}. O <span class="pos">+</span> vai no <b>PV+</b> do inversor e o <span class="neg">−</span> no <b>PV−</b>.`);
+    st.push(`Antes de ligar no inversor, meça esses dois fios com o multímetro em <b>V DC</b>: com sol deve dar perto de <b>${voc} V</b>. Se aparecer sinal de menos, os fios estão trocados.`);
+  } else {
+    st.push(`<b>Monte ${m} grupos iguais (strings) de ${n} placas em série:</b> dentro de cada grupo o <span class="neg">−</span> de uma placa vai no <span class="pos">+</span> da próxima.`);
+    st.push(`Cada string fica com um <span class="pos">+</span> e um <span class="neg">−</span> soltos. Meça cada uma com o multímetro em <b>V DC</b>: todas têm que dar quase a mesma tensão (perto de <b>${voc} V</b> com sol).`);
+    st.push(`<b>Junte os iguais:</b> todos os <span class="pos">+</span> num fio só e todos os <span class="neg">−</span> em outro, com conector MC4 em “Y” ou numa string box. <b>Nunca junte + com −</b>: dá curto e queima.`);
+    st.push(`O fio dos <span class="pos">+</span> vai no <b>PV+</b> do inversor e o dos <span class="neg">−</span> no <b>PV−</b>.` + (m >= 3 ? ' Com 3 ou mais strings, ponha um fusível em cada string (o valor está na etiqueta da placa).' : ''));
+  }
+  st.push('Faça as ligações com o <b>disjuntor DC do inversor desligado</b>. Placa no sol sempre tem tensão: se puder, cubra as placas enquanto liga.');
+  $('#wiring-steps').innerHTML = st.map(t => `<li>${t}</li>`).join('');
 }
 // ===== Verificações, resultados e textos =====
 let NN = null, RES = null, REF = null, CHK = [], SIG = '', curT = 11.5, playing = false, lastIdx = -1;
