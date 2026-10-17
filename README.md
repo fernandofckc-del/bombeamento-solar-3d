@@ -4,6 +4,7 @@ Simulador do bombeamento solar do poço: placas em série, inversor GiUMI TE380-
 
 - Desenho 3D com o poço em corte, as placas, o inversor e a caixa d'água
 - Página separada em abas com ícones: Resumo, Gráficos, Placas, Inversor, Bomba, Poço e Clima
+- Duas bombas pra comparar: opção 1 OM4A 3 HP + 4BPL3-16 e opção 2 OM4A 2 HP + Thebe TSML-0611 (curvas estimadas)
 - Opções de ligação com as placas que você tem (12): mostra a água no dia de cada uma e indica a melhor (8 em série)
 - Esquema de ligação das placas (série e strings em paralelo)
 - Simulação do dia em passos de 5 minutos: frequência, vazão, corrente e água no dia

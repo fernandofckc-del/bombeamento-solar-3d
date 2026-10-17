@@ -267,7 +267,7 @@ td{font-family:var(--f-data);font-variant-numeric:tabular-nums}
   <span class="mark" aria-hidden="true"></span>
   <div>
     <h1>Bombeamento Solar 3D</h1>
-    <p>Inversor GiUMI TE380 · bomba Ebara OM4A 3 HP · poço de 79 m, bomba a 45 m</p>
+    <p id="top-sub">Inversor GiUMI TE380 · bomba Ebara OM4A 3 HP · poço de 79 m, bomba a 45 m</p>
   </div>
 </header>
 
@@ -479,15 +479,27 @@ td{font-family:var(--f-data);font-variant-numeric:tabular-nums}
 
     <!-- Bomba -->
     <div class="panel" role="tabpanel" id="p-bomba" aria-labelledby="tab-bomba" hidden>
+      <div class="blk">
+        <div class="hd"><h2>Comparar as bombas</h2><span class="sum">com as placas e o poço de agora</span></div>
+        <div class="in">
+          <div class="opts" id="pumpcmp"></div>
+          <p class="hint">A curva das duas é <span class="est">estimada</span>. Quando tiver o catálogo, copie os pontos na tabela abaixo pra ficar exato.</p>
+        </div>
+      </div>
+
       <div class="blk" id="blk-pump">
         <div class="hd"><h2>Bomba</h2><span class="sum" id="sum-pump"></span></div>
         <div class="in">
-          <p class="hint">Motor pela etiqueta (OM4A, 3 HP, 220 V trifásico, Imax 11,7 A). A curva depende do bombeador, a parte de cima da bomba, que tem etiqueta própria (ex.: 4BPL3-16).</p>
+          <div class="seg" id="seg-pump" role="group" aria-label="Qual bomba">
+            <button data-pump="4bpl3-16" aria-pressed="true">Opção 1 · 3 HP</button>
+            <button data-pump="tsml-0611" aria-pressed="false">Opção 2 · 2 HP</button>
+          </div>
+          <p class="hint" id="pump-note"></p>
           <div class="fields">
             <label class="fld"><span>Potência do motor</span><div class="ig"><input id="in-hp" data-path="pump.hp" inputmode="decimal"><i>HP</i></div></label>
             <label class="fld"><span>Corrente máxima (etiqueta)</span><div class="ig"><input id="in-imax" data-path="pump.iMax" inputmode="decimal"><i>A</i></div></label>
             <label class="fld"><span>Tensão do motor</span><div class="ig"><input id="in-mv" data-path="pump.v" inputmode="decimal"><i>V</i></div></label>
-            <label class="fld"><span>Curva</span><div class="ig"><select id="in-preset" data-path="pump.preset"><option value="4bpl3-16">4BPL3-16 (estimada)</option><option value="custom">Minha curva (catálogo)</option></select></div></label>
+            <label class="fld"><span>Curva</span><div class="ig"><select id="in-preset" data-path="pump.preset"><option value="4bpl3-16">4BPL3-16 (estimada)</option><option value="tsml-0611">TSML-0611 (estimada)</option><option value="custom">Minha curva (catálogo)</option></select></div></label>
           </div>
           <p class="hint"><span class="est">estimada</span> Pontos da curva a 60 Hz. Copie do catálogo da sua bomba: vazão em m³/h e altura em metros.</p>
           <div class="tablewrap"><table class="ctable"><thead><tr><th>Ponto</th><th>Vazão (m³/h)</th><th>Altura (m)</th></tr></thead><tbody id="ctbody"></tbody></table></div>
@@ -1361,6 +1373,15 @@ const clone = (o) => JSON.parse(JSON.stringify(o));
 
 const STORE = 'bombeamento-solar-3d:v1', TAB_STORE = 'bombeamento-solar-3d:aba';
 const DEF_CURVE = [[0, 168], [1, 163], [2, 152], [3, 136], [4, 114], [5, 86], [6, 52]];
+// TSML-0611 (11 estágios, 2 CV): estimada pelos dois pontos do vendedor, 2,0 m³/h a 98 m e 13,2 m³/h a 10 m, com o melhor ponto perto de 6 m³/h
+const TSML_CURVE = [[0, 104], [2, 98], [4, 82], [6, 58], [8, 38], [10, 22], [13.2, 10]];
+const PUMP_SETS = {
+  '4bpl3-16': { opt: 'Opção 1', motor: 'OM4A 3 HP', end: '4BPL3-16', hp: 3, iMax: 11.7, effMotor: 74, etaBep: 55, curve: DEF_CURVE,
+    note: 'Motor OM4A 3 HP, 220 V trifásico, Imax 11,7 A. Bombeador 4BPL3-16 com curva <span class="est">estimada</span>.' },
+  'tsml-0611': { opt: 'Opção 2', motor: 'OM4A 2 HP', end: 'TSML-0611', hp: 2, iMax: 9, effMotor: 72, etaBep: 58, curve: TSML_CURVE,
+    note: 'Motor OM4A 2 HP, 220 V trifásico, Imax 9,0 A. Bombeador Thebe/Ebara TSML-0611 (11 estágios, saída 1½") com curva <span class="est">estimada</span> por 2 pontos do vendedor: 2,0 m³/h a 98 m e 13,2 m³/h a 10 m.' }
+};
+const curveName = (preset) => PUMP_SETS[preset] ? 'curva estimada ' + PUMP_SETS[preset].end : 'minha curva';
 const DEF = {
   avail: 12, nSeries: 8, nStrings: 1, std: { w: 550, vmp: 41.7, voc: 49.6 },
   panels: Array.from({ length: 8 }, () => ({ w: 550, vmp: 41.7, voc: 49.6 })),
@@ -1441,7 +1462,7 @@ function bindInputs() {
     if (el.type === 'checkbox') el.addEventListener('change', () => { setP(ST, p, el.checked); changed(); });
     else if (el.tagName === 'SELECT') el.addEventListener('change', () => {
       setP(ST, p, el.value);
-      if (p === 'pump.preset' && el.value === '4bpl3-16') { ST.pump.curve = clone(DEF_CURVE); fillCurveTable(); }
+      if (p === 'pump.preset' && PUMP_SETS[el.value]) { ST.pump.curve = clone(PUMP_SETS[el.value].curve); fillCurveTable(); }
       if (p === 'well.pipe') $('#fld-dmm').hidden = el.value !== 'custom';
       changed();
     });
@@ -1488,9 +1509,24 @@ function bindInputs() {
     if (ST.pump.preset !== 'custom') { ST.pump.preset = 'custom'; $('#in-preset').value = 'custom'; }
     changed();
   });
+  document.querySelectorAll('#seg-pump button').forEach(b => b.addEventListener('click', () => { usePump(b.dataset.pump); }));
+  $('#pumpcmp').addEventListener('click', (e) => { const b = e.target.closest('.use'), c = b && b.closest('.opt'); if (c) usePump(c.dataset.pump); });
   document.querySelectorAll('#seg-sky button').forEach(b => b.addEventListener('click', () => {
     ST.day.sky = b.dataset.sky; syncSky(); changed();
   }));
+}
+function usePump(key) {
+  const P = PUMP_SETS[key]; if (!P) return;
+  Object.assign(ST.pump, { hp: P.hp, iMax: P.iMax, effMotor: P.effMotor, etaBep: P.etaBep, preset: key, curve: clone(P.curve) });
+  fillInputs(); changed();
+}
+function pumpKey() { // qual opção está em uso (motor e curva iguais aos do conjunto)
+  return Object.keys(PUMP_SETS).find(k => { const P = PUMP_SETS[k]; return ST.pump.preset === k && ST.pump.hp === P.hp && ST.pump.iMax === P.iMax; }) || '';
+}
+function syncPump() {
+  const k = pumpKey();
+  document.querySelectorAll('#seg-pump button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.pump === k)));
+  $('#pump-note').innerHTML = k ? PUMP_SETS[k].note : 'Motor e curva do jeito que você preencheu abaixo.';
 }
 function syncSky() { document.querySelectorAll('#seg-sky button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.sky === ST.day.sky))); }
 
@@ -1503,7 +1539,7 @@ function fillInputs() {
     const box = el.closest('.ig'); box && box.classList.remove('bad');
   });
   $('#fld-dmm').hidden = ST.well.pipe !== 'custom';
-  syncSky(); fillPanelTable(); fillCurveTable();
+  syncSky(); syncPump(); fillPanelTable(); fillCurveTable();
 }
 
 function fillPanelTable() {
@@ -1703,10 +1739,12 @@ function renderSums() {
   const N = NN.N, s = ST;
   $('#sum-placas').textContent = `${N.nSeries} em série${N.nStrings > 1 ? ' × ' + N.nStrings : ''} · ${fmt(REF.pStc / 1000, 2)} kWp`;
   $('#sum-inv').textContent = `${fmt(N.inv.vdcMin, 0)}–${fmt(N.inv.vdcMax, 0)} V · ${fmt(N.inv.iNom, 0)} A · ${fmt(N.inv.fMin, 0)}–${fmt(N.inv.fMax, 0)} Hz`;
-  $('#sum-pump').textContent = `${fmt(N.pump.hp, 1)} HP · ${s.pump.preset === 'custom' ? 'minha curva' : 'curva estimada'}`;
+  $('#sum-pump').textContent = `${fmt(N.pump.hp, 1)} HP · ${curveName(s.pump.preset)}`;
+  $('#top-sub').textContent = `Inversor GiUMI TE380 · bomba Ebara OM4A ${fmt(N.pump.hp, 0)} HP · poço de ${fmt(N.well.depth, 0)} m, bomba a ${fmt(N.well.pumpDepth, 0)} m`;
+  syncPump();
   $('#sum-well').textContent = `${fmt(N.well.depth, 0)} m · bomba a ${fmt(N.well.pumpDepth, 0)} m · NE ${fmt(N.well.ne, 0)} m`;
   $('#sum-day').textContent = `${SKY_TXT[N.day.sky]} · ${fmt(N.day.tMin, 0)}–${fmt(N.day.tMax, 0)} °C`;
-  $('#pump-aside').textContent = s.pump.preset === 'custom' ? 'sua curva' : 'curva estimada';
+  $('#pump-aside').textContent = curveName(s.pump.preset);
 }
 
 function stepAt(t) { const i = Math.round((t - SIM.T0) / SIM.DT_H); return RES.steps[Math.max(0, Math.min(RES.steps.length - 1, i))]; }
@@ -1888,6 +1926,7 @@ function recompute(first) {
   renderTiles(); renderChecks(); renderSums(); renderLegends(); drawWiring(nn.N, REF);
   if (!$('#hourwrap').hidden) renderHours();
   if (curTab === 'placas') renderOptions();
+  if (curTab === 'bomba') renderPumpCmp();
   const weak = (REF.iMaxP - REF.iMinP) / REF.iMaxP > 0.03 ? REF.weak : -1;
   const N = nn.N, th = Math.min(Math.max(N.well.hDest, 1.2), 8);
   const sig = JSON.stringify([N.nSeries, N.nStrings, N.well.depth, N.well.pumpDepth, N.well.ne, th, weak]);
@@ -2024,6 +2063,39 @@ function renderOptions() {
   }, 60);
 }
 
+// ===== Comparar as duas bombas com as placas e o poço de agora =====
+let CMP_SIG = '';
+function renderPumpCmp() {
+  if (!NN) return;
+  const N = NN.N, sig = JSON.stringify([N.nSeries, N.nStrings, N.panels, N.pv, N.inv, N.well, N.day.gMax, N.day.tMin, N.day.tMax, N.day.tr, N.day.ts]);
+  if (sig !== CMP_SIG) {
+    CMP_SIG = sig;
+    const rows = Object.keys(PUMP_SETS).map(k => {
+      const P = PUMP_SETS[k], pump = Object.assign({}, N.pump, { hp: P.hp, iMax: P.iMax, effMotor: P.effMotor, etaBep: P.etaBep, curve: P.curve });
+      const run = (sky) => SIM.runDay(Object.assign({}, N, { pump, day: Object.assign({}, N.day, { sky }) }));
+      const A = run('clear'), B = run('overcast');
+      return { k, P, vol: A.sm.vol, volO: B.sm.vol, fMax: A.sm.fMax, iMax: A.sm.iMax, qMax: A.sm.qMax, dry: A.sm.dryMin };
+    });
+    const best = rows.slice().sort((a, b) => b.vol - a.vol)[0];
+    $('#pumpcmp').innerHTML = rows.map(r => {
+      const tight = r.iMax > r.P.iMax * 0.97, lv = r.dry ? 'bad' : tight ? 'warn' : 'ok';
+      const st = r.dry ? 'Seca o poço: o nível chega na bomba' : tight
+        ? `Corrente no limite da etiqueta (${fmt(r.iMax, 1)} de ${fmt(r.P.iMax, 1)} A): programe o inversor em ${fmt(r.P.iMax, 1)} A`
+        : `Corrente até ${fmt(r.iMax, 1)} A (etiqueta ${fmt(r.P.iMax, 1)} A) · até ${fmt(r.fMax, 0)} Hz`;
+      return `<div class="opt${r === best ? ' rec' : ''}" data-pump="${r.k}">` +
+        `<div class="nm">${r.P.opt}${r === best ? '<span class="pill">Mais água</span>' : ''}<small>${r.P.motor} + ${r.P.end}</small></div>` +
+        `<div><button class="use">Usar</button></div>` +
+        `<div class="nums"><span>sol <b>${fmt(r.vol, 1)} m³</b></span><span>nublado <b>${fmt(r.volO, 1)} m³</b></span><span>até ${fmt(r.qMax, 1)} m³/h</span></div>` +
+        `<div class="st" data-l="${lv}"><i>${OPT_MARK[lv]}</i>${st}</div></div>`;
+    }).join('');
+  }
+  const k = pumpKey();
+  document.querySelectorAll('#pumpcmp .opt').forEach(c => {
+    const cur = c.dataset.pump === k, b = c.querySelector('.use');
+    c.classList.toggle('cur', cur); b.disabled = cur; b.textContent = cur ? 'Em uso' : 'Usar';
+  });
+}
+
 // ===== Abas =====
 const TABS = ['res', 'graf', 'placas', 'inv', 'bomba', 'poco', 'clima'];
 let curTab = 'res';
@@ -2045,6 +2117,7 @@ function showTab(id, focus) {
   if (!RES) return;
   if (id === 'graf') { drawDay(); drawPump(stepAt(curT)); }
   if (id === 'placas') { drawWiring(NN.N, REF); renderOptions(); }
+  if (id === 'bomba') renderPumpCmp();
 }
 function bindTabs() {
   const bar = $('#tabs');
@@ -2078,7 +2151,7 @@ function summaryText() {
   L.push(`Placas: ${N.nSeries} em série${N.nStrings > 1 ? ' × ' + N.nStrings + ' strings' : ''} = ${fmt(REF.pStc / 1000, 2)} kWp (de ${ST.avail} disponíveis)` + (same ? ` (${fmt(p0.w, 0)} W, Vmp ${fmt(p0.vmp, 1)} V, Voc ${fmt(p0.voc, 1)} V)` : ' (placas diferentes)'));
   L.push(`String: Vmp ${fmt(REF.sumVmp, 0)} V / Voc ${fmt(REF.sumVoc, 0)} V · Voc manhã fria ${fmt(REF.vocCold, 0)} V · Vmp meio-dia ${fmt(REF.vmpHot, 0)} V`);
   L.push(`Inversor: ${fmt(N.inv.vdcMin, 0)}–${fmt(N.inv.vdcMax, 0)} V DC, ${fmt(N.inv.iNom, 0)} A, ${fmt(N.inv.fMin, 0)}–${fmt(N.inv.fMax, 0)} Hz, boost ${N.inv.boost ? 'sim' : 'não'}, limite de corrente ${N.inv.limitI ? 'sim' : 'não'}`);
-  L.push(`Bomba: ${fmt(N.pump.hp, 1)} HP ${fmt(N.pump.v, 0)} V trifásica, Imax ${fmt(N.pump.iMax, 1)} A · ${ST.pump.preset === 'custom' ? 'curva informada' : 'curva estimada 4BPL3-16'}: ` + N.pump.curve.map(([q, h]) => `${fmt(q, 1)}/${fmt(h, 0)}`).join(' '));
+  L.push(`Bomba: ${fmt(N.pump.hp, 1)} HP ${fmt(N.pump.v, 0)} V trifásica, Imax ${fmt(N.pump.iMax, 1)} A · ${curveName(ST.pump.preset)}: ` + N.pump.curve.map(([q, h]) => `${fmt(q, 1)}/${fmt(h, 0)}`).join(' '));
   L.push(`Poço: ${fmt(N.well.depth, 0)} m, bomba a ${fmt(N.well.pumpDepth, 0)} m, NE ${fmt(N.well.ne, 0)} m, ND ${fmt(N.well.ndTest, 0)} m com ${fmt(N.well.qTest, 1)} m³/h · entrega +${fmt(N.well.hDest, 0)} m, ${fmt(N.well.lHoriz, 0)} m de tubo ${PIPE_TXT[ST.well.pipe] || fmt(N.well.dMm, 0) + ' mm'}`);
   L.push(`Resultado: ${fmt(sm.vol, 1)} m³/dia · ${fmt(sm.hours, 1)} h bombeando${sm.tStart != null ? ' (' + hm(sm.tStart) + '–' + hm(sm.tEnd) + ')' : ''} · vazão máx ${fmt(sm.qMax, 1)} m³/h · até ${fmt(sm.fMax, 1)} Hz · corrente máx ${fmt(sm.iMax, 1)} A`);
   const av = CHK.filter(c => c.l !== 'ok');
